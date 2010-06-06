@@ -1,0 +1,57 @@
+object frmRLFeedBack: TfrmRLFeedBack
+  Left = 291
+  Height = 129
+  Top = 251
+  Width = 393
+  HorzScrollBar.Range = 61
+  VertScrollBar.Range = 45
+  ActiveControl = BitBtnCancel
+  Caption = 'Progresso'
+  ClientHeight = 129
+  ClientWidth = 393
+  Font.Height = 11
+  Font.Name = 'MS Sans Serif'
+  Font.Pitch = fpVariable
+  OnDestroy = FormDestroy
+  Position = poScreenCenter
+  LCLVersion = '0.9.28.2'
+  object LabelStepName: TLabel
+    Left = 14
+    Height = 20
+    Top = 12
+    Width = 121
+    Caption = 'LabelStepName'
+    Font.Height = 12
+    Font.Name = 'MS Sans Serif'
+    Font.Pitch = fpVariable
+    ParentColor = False
+    ParentFont = False
+  end
+  object ProgressBar: TProgressBar
+    Left = 14
+    Height = 17
+    Top = 28
+    Width = 355
+    Anchors = [akTop, akLeft, akRight]
+    Step = 1
+    TabOrder = 1
+  end
+  object BitBtnCancel: TBitBtn
+    Left = 151
+    Height = 25
+    Top = 65
+    Width = 85
+    Anchors = [akBottom]
+    Caption = '&Cancelar'
+    Kind = bkCancel
+    OnClick = BitBtnCancelClick
+    TabOrder = 0
+  end
+  object TimerBlink: TTimer
+    Enabled = False
+    Interval = 300
+    OnTimer = TimerBlinkTimer
+    left = 4
+    top = 64
+  end
+end

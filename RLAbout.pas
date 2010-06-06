@@ -2,16 +2,20 @@
 
 unit RLAbout;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
   SysUtils, Classes, 
 {$ifdef MSWINDOWS}
-  ShellAPI,
+  ShellAPI, Windows,
 {$endif}
-{$ifdef VCL}
-  Windows, Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Buttons, 
-{$endif}
+{$if defined(VCL) or defined(FPC)}
+  Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Buttons,
+{$ifend}
 {$ifdef CLX}
   Types, 
   Qt, QGraphics, QControls, QForms, QDialogs, QStdCtrls, QExtCtrls, QButtons, 
@@ -45,7 +49,8 @@ implementation
 
 constructor TFormRLAbout.Create(AOwner: TComponent);
 begin
-  inherited CreateNew(AOwner);
+  // FIXME/FPC: Con SVN el 2do param es opcional.
+  inherited CreateNew(AOwner {$ifdef FPC} ,0 {$endif});
   TypedAuthorKey := '';
   Init;
 end;
@@ -85,20 +90,21 @@ begin
   Left := 250;
   Top := 223;
   ActiveControl := BitBtnOk;
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
   BorderStyle := bsDialog;
 {$else}
   BorderStyle := fbsDialog;
-{$endif};
+{$ifend};
   Caption := LocaleStrings.LS_AboutTheStr + ' ' + CS_ProductTitleStr;
   ClientHeight := 155;
   ClientWidth := 373;
   Color := clWhite;
   Position := poScreenCenter;
+{$ifndef FPC}
   Scaled := False;
+{$endif}
   PixelsPerInch := 96;
   KeyPreview := True;
-  Scaled := False;
   AutoScroll := False;
 
   ImageLogo := TImage.Create(Self);

@@ -1,10 +1,17 @@
 {@unit RLRichText - Implementação dos componentes de impressão de texto no formato RichText.}
 unit RLRichText;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
-  Classes, SysUtils, Contnrs, Math, 
+  Classes, SysUtils, Contnrs, Math,
+{$ifdef FPC}
+    Types, Graphics, RLMetaVCL,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -13,7 +20,8 @@ uses
 {$ifdef CLX}
   QGraphics, RLMetaCLX, 
 {$else}
-  Graphics, RLMetaVCL, 
+  Graphics, RLMetaVCL,
+{$endif}
 {$endif}
   RLReport, RLUtils, RLMetaFile;
 

@@ -1,9 +1,16 @@
 unit RLPrintDialog;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
   Classes, SysUtils, 
+{$ifdef FPC}
+  Messages, Graphics, Controls, Forms, Dialogs,  StdCtrls,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -11,7 +18,8 @@ uses
 {$ifdef VCL}
   Messages, Graphics, Controls, Forms, Dialogs, StdCtrls, 
 {$else}
-  QGraphics, QControls, QForms, QDialogs, QStdCtrls, 
+  QGraphics, QControls, QForms, QDialogs, QStdCtrls,
+{$endif}
 {$endif}
   RLFilters, RLConsts, RLPrinters, RLTypes;
 
@@ -96,6 +104,9 @@ type
 
 implementation
 
+{$ifdef FPC}
+{$R *.lfm}
+{$endif}
 //{$R *.dfm}
 
 // UTILS
@@ -157,12 +168,14 @@ begin
   ClientHeight := 291;
   ClientWidth := 561;
   Position := poScreenCenter;
+{$ifndef FPC}
   Scaled := False;
-{$ifdef VCL}
+{$endif}
+{$if defined(VCL) or defined(FPC)}
   BorderStyle := bsDialog;
 {$else}
   BorderStyle := fbsDialog;
-{$endif};
+{$ifend};
   GroupBoxPrinter := TGroupBox.Create(Self);
   with GroupBoxPrinter do
   begin

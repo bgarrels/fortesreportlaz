@@ -1,13 +1,21 @@
 unit RLFindDialog;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  SysUtils, Contnrs, Classes, 
+  SysUtils, Contnrs, Classes,
+{$ifdef FPC}
+  Forms, Dialogs, Controls, StdCtrls, Buttons, ExtCtrls, Graphics,
+{$else}
 {$ifdef VCL}
   Windows, Messages, Graphics, Controls, Forms, Dialogs, StdCtrls, Buttons, ExtCtrls, 
 {$else}
-  Types, QControls, Qt, QButtons, QExtCtrls, QForms, QDialogs, QStdCtrls, QTypes, QGraphics, 
+  Types, QControls, Qt, QButtons, QExtCtrls, QForms, QDialogs, QStdCtrls, QTypes, QGraphics,
+{$endif}
 {$endif}
   RLConsts, RLUtils;
 
@@ -54,6 +62,9 @@ var
 
 implementation
 
+{$ifdef FPC}
+{$R *.lfm}
+{$endif}
 ///{$R *.DFM}
 
 { TfrmRLFindDialog }
@@ -70,11 +81,11 @@ end;
 procedure TfrmRLFindDialog.Init;
 begin
   BorderIcons := [biSystemMenu];
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
   BorderStyle := bsDialog;
 {$else}
   BorderStyle := fbsDialog;
-{$endif}
+{$ifend}
   Caption := 'Procurar';
   ClientHeight := 94;
   ClientWidth := 367;

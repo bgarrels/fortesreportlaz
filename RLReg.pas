@@ -1,13 +1,21 @@
 unit RLReg;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
-  Classes, RLDesign, 
+  Classes, RLDesign,
+{$ifdef FPC}
+  PropEdits, ComponentEditors, LCLType, LResources,
+{$else}
 {$ifdef DELPHI5}
   DsgnIntF, 
 {$else}
-  DesignIntF, 
+  DesignIntF,
+{$endif}
 {$endif}
   RLReport, RLDraftFilter, RLRichFilter, RLHTMLFilter, RLPDFFilter, RLParser, 
   RLPreview, RLMetaFile, RLBarcode, RLRichText, RLPreviewForm, RLXLSFilter;
@@ -56,5 +64,10 @@ begin
   RegisterPropertyEditor(TypeInfo(TRLDataFieldsProperty), TRLCustomGroup, 'DataFields', TRLDataFieldsEditor);
 end;
 
-end.
+{$IFDEF FPC}
+initialization
+  {$I rlibfpc.lrs}
+{$ENDIF}
+
+ end.
 

@@ -1,17 +1,25 @@
 unit RLSaveDialog;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
-  Classes, SysUtils, 
+  Classes, SysUtils,
+{$ifdef FPC}
+  LCLType, Messages, Graphics, Controls, Forms, Dialogs, StdCtrls, Buttons,
+{$else}
 {$ifndef LINUX}
-  Windows, 
+  Windows, Dialogs,
 {$else}
 {$endif}
 {$ifdef VCL}
-  Messages, Graphics, Controls, Forms, Dialogs, StdCtrls, Buttons, 
+  Messages, Graphics, Controls, Forms, StdCtrls, Buttons, 
 {$else}
-  QGraphics, QControls, QForms, QDialogs, QStdCtrls, QButtons, 
+  QGraphics, QControls, QForms, QDialogs, QStdCtrls, QButtons,
+{$endif}
 {$endif}
   RLFilters, RLConsts, RLTypes, RLUtils;
 
@@ -71,6 +79,9 @@ type
 
 implementation
 
+{$ifdef FPC}
+{$R *.lfm}
+{$endif}
 //{$R *.DFM}
 
 // UTILS
@@ -125,16 +136,18 @@ begin
   Left := 211;
   Top := 407;
   ActiveControl := EditFileName;
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
   BorderStyle := bsDialog;
 {$else}
   BorderStyle := fbsDialog;
-{$endif};
+{$ifend};
   Caption := 'Salvar como';
   ClientHeight := 224;
   ClientWidth := 391;
   Color := clBtnFace;
+{$ifndef FPC}
   Font.Charset := DEFAULT_CHARSET;
+{$endif}
   Font.Color := clWindowText;
   Font.Height := 11;
   Font.Name := 'MS Sans Serif';

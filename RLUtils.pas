@@ -1,10 +1,20 @@
 {@unit RLUtils - Rotinas de uso geral. }
 unit RLUtils;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
   SysUtils, Classes, Math, DB,
+{$ifdef FPC}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  Types, Graphics, IntfGraphics, Forms;
+{$else}
 {$ifndef LINUX}
   Windows,
 {$else}
@@ -15,12 +25,13 @@ uses
 {$else}
   QGraphics, QForms;
 {$endif}
+{$endif}
 
-{$IFDEF DELPHI7}
+{$IF DEFINED(DELPHI7) OR DEFINED(FPC)}
 //Esta funções existem a partir do Delphi 2009 e foram recriadas para evitar warnings
 function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean; overload;
 function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean; overload;
-{$ENDIF}
+{$IFEND}
 
 {@var TempDir - Especifica aonde deverão ser criados os arquivos temporários.
  Na inicialização do sistema é atribuido um valor padrão a esta variável. Este valor pode ser alterado depois.
@@ -168,14 +179,14 @@ procedure LogClear;
 procedure Log(const AMsg: String);
 
 type
-{$ifdef KYLIX}
+{$if defined(KYLIX) or defined(FPC)}
   TRGBQuad = packed record
     rgbBlue: Byte;
     rgbGreen: Byte;
     rgbRed: Byte;
     rgbReserved: Byte;
   end;
-{$endif}
+{$ifend}
   TRGBArray = array[0..0] of TRGBQuad;
   PRGBArray = ^TRGBArray;
 
@@ -195,7 +206,7 @@ type
 
 implementation
 
-{$IFDEF DELPHI7}
+{$IF DEFINED(DELPHI7) OR DEFINED(FPC)}
 function CharInSet(C: AnsiChar; const CharSet: TSysCharSet): Boolean;
 begin
   Result := C in CharSet;
@@ -205,7 +216,7 @@ function CharInSet(C: WideChar; const CharSet: TSysCharSet): Boolean;
 begin
   Result := (C < #$0100) and (AnsiChar(C) in CharSet);
 end;
-{$ENDIF}
+{$IFEND}
 
 function NewBitmap: TBitmap;
 begin
@@ -371,12 +382,17 @@ end;
 
 // diretório temporário
 function GetTempDir: String;
+{$ifndef FPC}
 {$ifndef LINUX}
 var
   P: array[0..255] of char;
   H: String;
 {$endif}
+{$endif}
 begin
+{$ifdef FPC}
+  Result := SysUtils.GetTempDir;
+{$else}
 {$ifndef LINUX}
   GetDir(0, H); // salva diretório atual
   GetWindowsDirectory(@P, 256); // diretório do windows
@@ -389,6 +405,7 @@ begin
   end;
 {$else}
   TempDir := '/tmp';
+{$endif}
 {$endif}
 end;
 
@@ -632,6 +649,78 @@ begin
   end;
 end;
 
+{$ifdef FPC}
+
+// Tomado de fortes324forlaz.
+procedure RotateBitmap(aSource,aDest:TBitmap; aAngle:double; aAxis,aOffset:TPoint);
+var
+  x            :integer;
+  xDest        :integer;
+  xOriginal    :integer;
+  xPrime       :integer;
+  xPrimeRotated:integer;
+  //
+  y            :integer;
+  yDest        :integer;
+  yOriginal    :integer;
+  yPrime       :integer;
+  yPrimeRotated:integer;
+  //
+  Radians      :double;
+  RadiansCos   :double;
+  RadiansSin   :double;
+  NormalImg    :TLazIntfImage;
+  RotateImg    :TLazIntfImage;
+begin
+  // create intermediary images
+  NormalImg := aSource.CreateIntfImage;
+  RotateImg := TLazIntfImage.Create(aDest.Width, aDest.Height);
+  RotateImg.DataDescription := NormalImg.DataDescription;
+  RotateImg.SetSize(aDest.Width, aDest.Height);
+
+  // Convert degrees to radians. Use minus sign to force clockwise rotation.
+  Radians   :=aAngle*PI/180;
+  RadiansSin:=sin(Radians);
+  RadiansCos:=cos(Radians);
+  // Step through each row of rotated image.
+  for y:=0 to aDest.Height-1 do
+  begin
+    yDest  :=y-aOffset.y;
+    yPrime :=2*(yDest-aAxis.y)+1; // center y: -1,0,+1
+    // Step through each col of rotated image.
+    for x:=0 to aDest.Width-1 do
+    begin
+      xDest :=x-aOffset.x;
+      xPrime:=2*(xDest-aAxis.x)+1; // center x: -1,0,+1
+      // Rotate (xPrime, yPrime) to location of desired pixel
+      // Note:  There is negligible difference between floating point and scaled integer arithmetic here, so keep the math simple (and readable).
+      xPrimeRotated:=round(xPrime*RadiansCos-yPrime*RadiansSin);
+      yPrimeRotated:=round(xPrime*RadiansSin+yPrime*RadiansCos);
+      // Transform back to pixel coordinates of image, including translation
+      // of origin from axis of rotation to origin of image.
+      xOriginal:=(xPrimeRotated-1) div 2+aAxis.x;
+      yOriginal:=(yPrimeRotated-1) div 2+aAxis.y;
+      // Make sure (xOriginal, yOriginal) is in aSource.  If not, assign blue color to corner points.
+      if (xOriginal>=0) and (xOriginal<=aSource.Width-1) and (yOriginal>=0) and (yOriginal<=aSource.Height-1) then
+      begin
+        // Assign pixel from rotated space to current pixel in aDest
+        RotateImg.Colors[x,y]:=NormalImg.Colors[xOriginal,yOriginal];
+      end
+      else if aSource.Height>0 then
+      begin
+        RotateImg.Colors[x,y]:=NormalImg.Colors[0,0];
+      end
+      else
+        RotateImg.Colors[x,y]:=TColorToFPColor(clBlack);
+    end;
+  end;
+  aDest.LoadFromIntfImage(RotateImg);
+  RotateImg.Destroy;
+  NormalImg.Destroy;
+end;
+
+{$else}
+
 procedure RotateBitmap(ASource, ADest: TBitmap; AAngle: Double; AAxis, AOffset: TPoint);
 type
 {$ifdef KYLIX}
@@ -702,6 +791,8 @@ begin
     end;
   end;
 end;
+
+{$endif}
 
 function RotatedBitmap(ASource: TBitmap; AAngle: Double): TBitmap;
 var

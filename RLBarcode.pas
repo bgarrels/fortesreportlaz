@@ -3,13 +3,21 @@
 {@unit RLBarcode - Implementação dos componentes para código de barras. }
 unit RLBarcode;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-{$ifdef VCL}
-  Windows, Graphics, Dialogs, 
+{$ifdef FPC}
+  LCLIntf, Graphics, Dialogs,
 {$else}
-  Types, QGraphics, QDialogs, 
+{$ifdef VCL}
+  Windows, Graphics, Dialogs,
+{$else}
+  Types, QGraphics, QDialogs,
+{$endif}
 {$endif}
   Classes, SysUtils, DB, 
   RLReport, RLConsts;

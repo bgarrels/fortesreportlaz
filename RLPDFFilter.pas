@@ -1,14 +1,22 @@
 {@unit RLPDFFilter - Implementação do filtro para criação de arquivos PDF. }
 unit RLPDFFilter;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  SysUtils, Classes, Math, jpeg,
+  SysUtils, Classes, Math,
+{$ifdef FPC}
+    Types, Graphics, RLMetaVCL,
+{$else}
 {$ifdef VCL}
-  Windows, Graphics, RLMetaVCL, 
+  Windows, Graphics, RLMetaVCL, Jpeg, 
 {$else}
   Types, QGraphics, RLMetaCLX,
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLTypes, RLUtils, RLFilters;
 
@@ -298,18 +306,27 @@ type
 
     procedure Assign(Source: TRLPDFFilterPageSetup); reintroduce;
     procedure Clear;
-  published
+
+  // FIXME/FPC: Estas propiedades deberian ser published.
+  {$ifdef FPC}
+    public
+  {$else}
+    published
+  {$endif}
     property PaperSize: TRLPDFFilterPaperSizeType read FPaperSize write FPaperSize;
-    property LandScape: Boolean read FLandScape write FLandScape;
     property MediaSize: TRLPDFFilterPaperSizeType read FMediaSize write FMediaSize;
     property Margins: TRLPDFFilterMarginType read FMargins write FMargins;
-    property PageBorder: Boolean read FPageBorder write FPageBorder;
     property ColumnBorder: TRLPDFFilterColumnBorderType
       read FColumnBorder write FColumnBorder;
-    property BorderDashPattern: TRLPDFFilterDashPatternType
-      read FBorderDashPattern write FBorderDashPattern;
     property ColumnMargin: TRLPDFFilterMarginType read FColumnMargin write FColumnMargin;
     property ColumnGap: TRLPDFFilterLocationType read FColumnGap write FColumnGap;
+    property WorkArea: TRLPDFFilterMarginType read FWorkArea write FWorkArea;
+
+  published
+    property LandScape: Boolean read FLandScape write FLandScape;
+    property PageBorder: Boolean read FPageBorder write FPageBorder;
+    property BorderDashPattern: TRLPDFFilterDashPatternType
+      read FBorderDashPattern write FBorderDashPattern;
     property ColumnCount: Word read FColumnCount write FColumnCount;
     property RowCount: Word read FRowCount write FRowCount;
     property FontPointSize: Word read FFontPointSize write FFontPointSize;
@@ -319,7 +336,6 @@ type
     property ColumnLeadingPointSize: Word read FColumnLeadingPointSize
       write FColumnLeadingPointSize;
     property CharCount: Word read FCharCount write FCharCount;
-    property WorkArea: TRLPDFFilterMarginType read FWorkArea write FWorkArea;
   end;
 
   {@class TRLPDFFilterDocumentInfo - Informações para a geração de documento PDF. }
@@ -391,6 +407,11 @@ const
   NULLMARGIN: TRLPDFFilterMarginType = (Top: 0; Bottom: 0; Left: 0;
     Right: 0; Width: 0; Height: 0);
   NULLLOCATION: TRLPDFFilterLocationType = (X: 0; Y: 0);
+
+{$ifdef FPC}
+const
+  jf8bit = pf8bit;
+{$endif}
 
 // UTILS
 

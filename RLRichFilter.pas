@@ -1,10 +1,17 @@
 {@unit RLRichFilter - Implementação do filtro para geração de arquivos no formato RichText. }
 unit RLRichFilter;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
-  SysUtils, Classes, 
+  SysUtils, Classes,
+{$ifdef FPC}
+    Types, Graphics, RLMetaVCL,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -13,7 +20,8 @@ uses
 {$ifdef VCL}
   Graphics, RLMetaVCL, 
 {$else}
-  QGraphics, RLMetaCLX, 
+  QGraphics, RLMetaCLX,
+{$endif}
 {$endif}
   RLMetaFile, RLFilters, RLTypes, RLConsts, RLUtils;
 
@@ -455,13 +463,21 @@ var
   procedure CopyBrush(Brush: TRLMetaBrush; Bitmap: TBitmap);
   begin
     with Brush.Color do
+{$ifdef FPC}
+      Bitmap.Canvas.Brush.Color := RGBToColor(Red, Green, Blue);
+{$else}
       Bitmap.Canvas.Brush.Color := RGB(Red, Green, Blue);
+{$endif}
     Bitmap.Canvas.Brush.Style := FromMetaBrushStyle(Brush.Style);
   end;
   procedure CopyPen(Pen: TRLMetaPen; Bitmap: TBitmap);
   begin
     with Pen.Color do
+{$ifdef FPC}
+      Bitmap.Canvas.Pen.Color := RGBToColor(Red, Green, Blue);
+{$else}
       Bitmap.Canvas.Pen.Color := RGB(Red, Green, Blue);
+{$endif}
     Bitmap.Canvas.Pen.Style := FromMetaPenStyle(Pen.Style);
     Bitmap.Canvas.Pen.Width := Pen.Width;
   end;

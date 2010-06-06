@@ -2,14 +2,21 @@
 
 unit RLDesign;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  Classes, TypInfo, Db, SysUtils, 
+  Classes, TypInfo, Db, SysUtils,
+{$ifdef FPC}
+  PropEdits, ComponentEditors, LCLType, Forms,
+{$else}
 {$ifdef DELPHI5}
   DsgnIntF, 
 {$else}
-  DesignEditors, DesignIntf, 
+  DesignEditors, DesignIntf,
 {$endif}
 {$ifdef VCL}
   Forms, 
@@ -17,16 +24,21 @@ uses
 {$ifdef CLX}
   QForms, 
 {$endif}
+{$endif}
   RLReport, RLConsts, RLUtils, RLTypes, 
   RLAbout;
 
 type
 
+{$ifdef FPC}
+  IDesignerClass = TComponentEditorDesigner;
+{$else}
 {$ifdef DELPHI5}
   IDesignerClass = IFormDesigner;
 {$else}
   IDesignerClass = IDesigner;
 {$endif}
+{$endiF}
 
   { TRLReportDesigner }
 

@@ -1,13 +1,21 @@
 unit RLFeedBack;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  SysUtils, Classes, 
+  SysUtils, Classes,
+{$ifdef FPC}
+  Forms, Controls, StdCtrls, ComCtrls, Buttons, ExtCtrls, Graphics,
+{$else}
 {$ifdef VCL}
   Graphics, Forms, Dialogs, StdCtrls, ExtCtrls, Buttons, Controls, ComCtrls, 
 {$else}
-  QTypes, QGraphics, QForms, QDialogs, QStdCtrls, QExtCtrls, QButtons, QControls, QComCtrls, 
+  QTypes, QGraphics, QForms, QDialogs, QStdCtrls, QExtCtrls, QButtons, QControls, QComCtrls,
+{$endif}
 {$endif}
   RLUtils;
 
@@ -46,6 +54,9 @@ var
 
 implementation
 
+{$ifdef FPC}
+{$R *.lfm}
+{$endif}
 ///{$R *.DFM}
 
 uses
@@ -69,11 +80,11 @@ begin
   Font.Pitch := fpVariable;
   Font.Style := [];
   Position := poScreenCenter;
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
   BorderStyle := bsDialog
 {$else}
   BorderStyle := fbsDialog;
-{$endif};
+{$ifend};
   PixelsPerInch := 96;
   LabelStepName := TLabel.Create(Self);
   with LabelStepName do
@@ -138,7 +149,8 @@ constructor TfrmRLFeedBack.Create(const ATitle: String; ALevels: Integer = 1);
 var
   H, D: Integer;
 begin
-  inherited CreateNew(nil);
+  // FIXME/FPC: Con SVN el 2do parametro es opcional.
+  inherited CreateNew(nil {$ifdef FPC} ,0 {$endif});
   Init;
   //
   D := Height - BitBtnCancel.Top;

@@ -1,13 +1,24 @@
 {@unit RLTypes - Definição de tipos comuns e rotinas de manipulação de tipos. }
 unit RLTypes;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
+{$ifdef FPC}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  Printers,
+{$else}
 {$ifndef LINUX}
-  Windows, Printers, 
+  Windows, Printers,
 {$else}
   Types, QPrinters, 
+{$endif}
 {$endif}
   Classes;
 
@@ -25,12 +36,17 @@ type
     ClientHeight: Integer;
   end;
 
+{$ifdef FPC}
+  TRLSystemPaperType = Integer;
+  TRLSystemOrientation = TPrinterOrientation;
+{$else}
 {$ifndef LINUX}
   TRLSystemPaperType = Integer;
   TRLSystemOrientation = Integer;
 {$else}
   TRLSystemPaperType = TPageSize;
   TRLSystemOrientation = TPrinterOrientation;
+{$endif}
 {$endif}
 
   TRLPaperInfo = record
@@ -66,11 +82,17 @@ type
                 fpEng_DoublePost, fpEng_DoubleLarge, fpEng_Demy, fpEng_DoubleDemy, fpEng_QuadDemy, fpEng_MusicDemy, fpEng_Medium, fpEng_Royal, fpEng_SuperRoyal, 
                 fpEng_Elephant, fpEng_Imperial, 
                 fpCustom);
-                          
+
+{$ifdef FPC}
+const
+  DMPAPER_USER = 256;
+  UserPaperCode = DMPAPER_USER;
+{$else}
 {$ifndef LINUX}
 const UserPaperCode = DMPAPER_USER;
 {$else}
 const UserPaperCode = psNPageSize;
+{$endif}
 {$endif}
 
 var
@@ -141,6 +163,12 @@ begin
     AResultPaperWidth := PaperInfo[PaperSize].Width;
     AResultPaperHeight := PaperInfo[PaperSize].Height;
   end;
+{$ifdef FPC}
+  if AOrientationLandscape then
+    AResultOrientation := Printers.poLandscape
+  else
+    AResultOrientation := Printers.poPortrait;
+{$else}
 {$ifndef LINUX}
   if AOrientationLandscape then
     AResultOrientation := DMORIENT_LANDSCAPE
@@ -151,6 +179,7 @@ begin
     AResultOrientation := QPrinters.poLandscape
   else
     AResultOrientation := QPrinters.poPortrait;
+{$endif}
 {$endif}
 end;
 
@@ -332,6 +361,7 @@ initialization
   SetPaperInfo(fpCustom, 0, 0, 'User Defined');
 
   // Equivalências para Windows
+{$ifndef FPC}
 {$ifndef LINUX}
   SetPaperEqv(fpA2, DMPAPER_A2);
   SetPaperEqv(fpA3, DMPAPER_A3);
@@ -449,6 +479,7 @@ initialization
   SetPaperEqv(fpLedger, psLedger);
   SetPaperEqv(fpTabloid, psTabloid);
   SetPaperEqv(fpCustom, psNPageSize);
+{$endif}
 {$endif}
 
 end.

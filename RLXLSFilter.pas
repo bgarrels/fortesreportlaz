@@ -5,10 +5,14 @@ interface
 
 uses
   SysUtils, StrUtils, Classes, Contnrs, Math, DateUtils,
+{$ifdef FPC}
+  LCLType, Types, Graphics, RLMetaVCL,
+{$else}
 {$ifdef VCL}
   Windows, Graphics, RLMetaVCL,
 {$else}
   Types, QGraphics, RLMetaCLX, 
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLTypes, RLUtils, RLFilters;
 
@@ -1338,7 +1342,7 @@ begin
     FBorders[I].Free;
 end;
 
-function TRLXLSBorders.GetItem;
+function TRLXLSBorders.GetItem(I: TRLXLSBorderType): TRLXLSBorder;
 begin
   Result := FBorders[I];
 end;
@@ -2011,10 +2015,12 @@ begin
       fpVariable: font.bFamily := 2;
     end;
     case AFont.CharSet of
+{$ifndef FPC}
       fcsLatin1: font.bCharSet := 0;
       fcsKOI8R: font.bCharSet := 130;
       fcsSet_Ja: font.bCharSet := $80;
       fcsSet_Ko: font.bCharSet := 129;
+{$endif}
       ANSI_CHARSET: font.bCharSet := 0;
       DEFAULT_CHARSET: font.bCharSet := 1;
       SYMBOL_CHARSET: font.bCharSet := 2;

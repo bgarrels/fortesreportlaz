@@ -3,6 +3,10 @@
 {@unit RLConsts - Variáveis de internacionalização e variáveis de configuração. }
 unit RLConsts;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
@@ -247,6 +251,7 @@ end;
 
 procedure CheckVersion(Component: TComponent);
 begin
+  Exit;
   if Assigned(Component) and (csDesigning in Component.ComponentState) then
     Exit;
   if (KnownCommercialVersion <> KnownCommercialVersion) or

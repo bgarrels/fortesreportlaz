@@ -1,10 +1,17 @@
 {@unit RLPreview - Implementação dos componentes de pré-visualização. }
 unit RLPreview;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  Classes, SysUtils, Math, Contnrs, 
+  Classes, SysUtils, Math, Contnrs,
+{$ifdef FPC}
+    Types, Graphics, Controls, ExtCtrls, Forms, Menus, Clipbrd, Dialogs,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -13,7 +20,8 @@ uses
 {$ifdef VCL}
   Graphics, Controls, ExtCtrls, Forms, Menus, Clipbrd, Dialogs, 
 {$else}
-  QGraphics, QControls, QExtCtrls, QForms, QMenus, QClipbrd, QDialogs, 
+  QGraphics, QControls, QExtCtrls, QForms, QMenus, QClipbrd, QDialogs,
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLUtils;
 
@@ -343,8 +351,13 @@ begin
     FBoxes.Add(B);
   end;
   //
+// FIXME/FPC: Esto funciona con SVN.
+{$ifdef FPC}
+{$ifndef LINUX}
   HorzScrollBar.Tracking := True;
   VertScrollBar.Tracking := True;
+{$endif}
+{$endif}
 end;
 
 destructor TRLPreview.Destroy;
@@ -374,6 +387,12 @@ begin
   end;
 end;
 
+{$ifdef FPC}
+procedure TRLPreview.CopyPageWMF(Sender: TObject);
+begin
+  // FIXME/FPC: Implementar!
+end;
+{$else}
 procedure TRLPreview.CopyPageWMF(Sender: TObject);
 var
   mf: TMetaFile;
@@ -399,6 +418,7 @@ begin
     end;
   end;
 end;
+{$endif}
 
 procedure TRLPreview.FirstPage;
 begin

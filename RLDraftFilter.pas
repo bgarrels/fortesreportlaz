@@ -3,19 +3,31 @@
 {@unit RLDraftFilter - Implementação do filtro de impressão draft. }
 unit RLDraftFilter;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  SysUtils, Classes, Math, Contnrs, 
+  SysUtils, Classes, Math, Contnrs,
+{$ifdef FPC}
+{$ifdef Windows}
+  ShellApi, Windows, 
+{$endif}
+  LCLIntf, LCLType, OsPrinters, IntfGraphics, FPImage, FileUtil,
+  Graphics, RLMetaVCL,
+{$else}
 {$ifndef LINUX}
-  Windows, WinSpool, ShellApi, 
+  Windows, WinSpool, ShellApi,
 {$else}
   Types, Libc, 
 {$endif}
 {$ifdef VCL}
   Graphics, RLMetaVCL, 
 {$else}
-  QGraphics, RLMetaCLX, 
+  QGraphics, RLMetaCLX,
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLUtils, RLFilters, RLTypes, RLPrinters;
 
@@ -417,6 +429,94 @@ var
   PinsPerRow: Integer = 12;
   PinsPerCol: Integer = 12;
 
+{$ifdef FPC}
+
+// Tomado de fortes324forlaz.
+const
+  PlotColors:array [boolean] of TFPColor =
+  (
+    (Red: $ffff; Green: $ffff; Blue: $ffff; Alpha: alphaOpaque), // White
+    (Red: $0000; Green: $0000; Blue: $0000; Alpha: alphaOpaque)  // Black
+  );
+
+// Tomado de fortes324forlaz.
+procedure DoColorTable(aSource,aDest:TBitmap; aContrast:double=2);
+const
+  MatrixSize=4;
+  TheMatrix :array[0..MatrixSize-1,0..MatrixSize-1] of byte=((  0,192, 48,240),
+                                                             (128, 64,176,112),
+                                                             ( 32,224, 16,208),
+                                                             (160, 96,144, 80));
+var
+  x,y,i:integer;
+  plot :boolean;
+  R, G, B: byte;
+  SrcImg: TLazIntfImage;
+  DestImg: TLazIntfImage;
+begin
+  SrcImg := aSource.CreateIntfImage;
+  DestImg := TLazIntfImage.Create(aSource.Width, aSource.Height);
+  DestImg.DataDescription := SrcImg.DataDescription;
+  DestImg.SetSize(aSource.Width, aSource.Height);
+  for y:=0 to aSource.Height-1 do
+  begin
+    for x:=0 to aSource.Width-1 do
+    begin
+      //convert from FPColor to byte
+      with SrcImg.Colors[x,y] do
+      begin
+        R := (Red shr 8) and $ff;
+        G := (Green shr 8) and $ff;
+        B := (Blue shr 8) and $ff;
+      end;
+      i   :=(R+G+B) div 3;
+      i   :=Trunc(((i-128)*aContrast+128));
+      plot:=(i<TheMatrix[y mod MatrixSize,x mod MatrixSize]);
+      DestImg.Colors[x,y] := PlotColors[plot];
+    end;
+  end;
+  aDest.LoadFromIntfImage(DestImg);
+  SrcImg.Destroy;
+  DestImg.Destroy;
+end;
+
+// Tomado de fortes324forlaz.
+procedure DoErrorDiffusion(aSource,aDest:TBitmap; aContrast:double=2);
+var
+  x,y,i:integer;
+  plot :boolean;
+  R, G, B: byte;
+  SrcImg: TLazIntfImage;
+  DestImg: TLazIntfImage;
+begin
+  SrcImg := aSource.CreateIntfImage;
+  DestImg := TLazIntfImage.Create(aSource.Width, aSource.Height);
+  DestImg.DataDescription := SrcImg.DataDescription;
+  DestImg.SetSize(aSource.Width, aSource.Height);
+  for y:=0 to aSource.Height-1 do
+  begin
+    for x:=0 to aSource.Width-1 do
+    begin
+      //convert from FPColor to byte
+      with SrcImg.Colors[x,y] do
+      begin
+        R := (Red shr 8) and $ff;
+        G := (Green shr 8) and $ff;
+        B := (Blue shr 8) and $ff;
+      end;
+      i := (R+G+B) div 3;
+      i := Trunc(((i-128)*aContrast+128));
+      plot:=(i<Random(256));
+      DestImg.Colors[x,y] := PlotColors[plot];
+    end;
+  end;
+  aDest.LoadFromIntfImage(DestImg);
+  SrcImg.Destroy;
+  DestImg.Destroy;
+end;
+
+{$else}
+
 procedure DoColorTable(ASource, ADest: TBitmap; AContrast: Double = 2);
 const
   MatrixSize = 4;
@@ -488,6 +588,8 @@ begin
   end;
 end;
 
+{$endif}
+
 function TranslateAccents(const AString, ABS: String): String;
 var
   I, P: Integer;
@@ -529,11 +631,17 @@ end;
 function GetBitmapPixel(ABitmap: TBitmap; AX, AY: Integer; ADefault: TColor): TColor;
 begin
   if AY < ABitmap.Height then
+{$ifdef FPC}
+    Result := ABitmap.Canvas.Pixels[AX, AY]
+{$else}
     with TRGBArray(ABitmap.ScanLine[AY]^)[AX] do
       Result := RGB(rgbRed, rgbGreen, rgbBlue)
+{$endif}
   else
     Result := ADefault;
 end;
+
+{$if defined(MSWINDOWS) or defined(KYLIX)}
 
 function LinePrinterStart(const PrnName, DocName: String): Cardinal;
 var
@@ -550,11 +658,15 @@ end;
 
 procedure LinePrinterWrite(PrnHandle: Cardinal; const Text: String);
 var
+{$ifdef FPC}
+  Len: DWord;
+{$else}
   Len: Cardinal;
+{$endif}
 begin
   Len := Length(Text);
   if Len > 0 then
-    WritePrinter(PrnHandle, @Text[1], Len, Len);
+    WritePrinter(PrnHandle, @Text[1], Len, {$ifdef FPC} @Len {$else} Len {$endif});
 end;
 
 procedure LinePrinterEnd(PrnHandle: Cardinal);
@@ -563,6 +675,8 @@ begin
   EndDocPrinter(PrnHandle);
   ClosePrinter(PrnHandle);
 end;
+
+{$ifend}
 
 { TDraftImage }
 
@@ -661,13 +775,15 @@ begin
   FCurrentCharWidth := CPPPins(FCurrentCPP);
   FCurrentCharHeight := LPPPins(FCurrentLPP);
   //
+{$if defined(MSWINDOWS) or defined(KYLIX)}
   if FDeviceKind = dkPrinter then
     FPrinterHandle := LinePrinterStart(RLPrinter.PrinterName, 'FortesReport')
   else
   begin
+{$ifend}
     case FDeviceKind of
       dkPrinterPort: FDeviceFileName := RLPrinter.PrinterPort;
-      dkProgram: begin
+      dkProgram {$ifdef LINUX} ,dkPrinter {$endif}: begin
                        FDeviceFileName := GetTempFileName;
                        RegisterTempFile(FDeviceFileName);
                      end;
@@ -678,7 +794,9 @@ begin
     //
     AssignFile(FDeviceHandle, FDeviceFileName);
     Rewrite(FDeviceHandle, 1);
-  end; 
+{$if defined(MSWINDOWS) or defined(KYLIX)}
+  end;
+{$ifend}
   //
   ResetPage;
 end;
@@ -686,22 +804,29 @@ end;
 procedure TRLDraftFilter.InternalEndDoc;
 var
   cmd: String;
+{$ifdef FPC}
+  par: String;
+  I: Integer;
+{$else}
 {$ifndef LINUX}
 var
   par: String;
   I: Integer;
 {$endif}
+{$endif}
 begin
   NewPage;
   //
+{$if defined(MSWINDOWS) or defined(KYLIX)}
   if FDeviceKind = dkPrinter then
     LinePrinterEnd(FPrinterHandle)
   else
   begin
+{$ifend}
     CloseFile(FDeviceHandle);
     case FDeviceKind of
       dkPrinterPort: ;
-      dkProgram: 
+      dkProgram {$ifdef LINUX} ,dkPrinter {$endif}:
       begin
         cmd := FDevicePath;
         cmd := StringReplace(cmd, '%p', RLPrinter.PrinterName, [rfReplaceAll, rfIgnoreCase]);
@@ -714,12 +839,23 @@ begin
         cmd := Copy(cmd, 1, I - 1);
         ShellExecute(0, 'open', PChar(cmd), PChar(par), nil, SW_SHOWNORMAL);
 {$else}
+{$ifdef FPC}
+        I := Pos(' ', cmd);
+        if I = 0 then
+          I := Length(cmd) + 1;
+        par := Copy(cmd, I + 1, Length(cmd));
+        cmd := FindDefaultExecutablePath(Copy(cmd, 1, I - 1));
+        ExecuteProcess(cmd, par);
+{$else}
         Libc.system(PChar(cmd));
+{$endif}
 {$endif};
       end;
       dkFileName: ;
     end;
+{$if defined(MSWINDOWS) or defined(KYLIX)}
   end;
+{$ifend}
 end;
 
 procedure TRLDraftFilter.InternalNewPage;
@@ -814,9 +950,11 @@ end;
 procedure TRLDraftFilter.DeviceWrite(const AData: String);
 begin
   if AData <> '' then
+{$if defined(MSWINDOWS) or defined(KYLIX)}
     if FDeviceKind = dkPrinter then
       LinePrinterWrite(FPrinterHandle, AData)
     else
+{$ifend}
       BlockWrite(FDeviceHandle, AData[1], Length(AData));
 end;
 

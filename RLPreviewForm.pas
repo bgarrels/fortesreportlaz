@@ -1,16 +1,25 @@
 {@unit RLPreviewForm - Implementação do form padrão de pré-visualização. }
 unit RLPreviewForm;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
   SysUtils, Math, Contnrs, Classes,
+{$ifdef FPC}
+  LCLType, Types, Controls, Buttons, Forms, Dialogs, StdCtrls, Graphics, ExtCtrls,
+{$else}
 {$ifdef VCL}
   Windows, Controls, Buttons, ExtCtrls, Forms, Dialogs, StdCtrls, Graphics, 
 {$else}
   Types, QControls, Qt, QButtons, QExtCtrls, QForms, QDialogs, QStdCtrls, QTypes, QGraphics,
 {$endif}
-  RLConsts, RLMetaFile, RLPreview, RLFilters, RLUtils, RLPrintDialog, RLSaveDialog, RLPrinters, RLTypes, RLFindDialog;
+{$endif}
+  RLConsts, RLMetaFile, RLPreview, RLFilters, RLUtils, RLPrintDialog,
+  RLSaveDialog, RLPrinters, RLTypes, RLFindDialog;
 
 type
 
@@ -41,8 +50,6 @@ type
     PanelZoom: TPanel;
     ComboBoxZoom: TComboBox;
     PanelPageCount: TPanel;
-    PanelCopyright: TPanel;
-    SpeedButtonCopyright: TSpeedButton;
     SpeedButtonEdit: TSpeedButton;
     Bevel6: TBevel;
     SpeedButtonSend: TSpeedButton;
@@ -266,6 +273,9 @@ procedure PreviewFromFileDialog;
 
 implementation
 
+{$ifdef FPC}
+{$R *.lfm}
+{$endif}
 ///{$R *.dfm}
 
 var
@@ -366,7 +376,7 @@ begin
     end;
 end;
 
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
 const
   key_escape = vk_escape;
   key_home = vk_home;
@@ -378,7 +388,7 @@ const
   key_left = vk_left;
   key_right = vk_right;
   key_f3 = vk_f3;
-{$endif}
+{$ifend}
 
 constructor TRLPreviewForm.Create(AOwner: TComponent);
 begin
@@ -389,7 +399,8 @@ begin
   FFindDialog := nil;
   FSpeedButtonCustomAction := nil;
   //
-  inherited CreateNew(AOwner);
+  // FIXME/FPC: SVN no requiere el 2do parametro.
+  inherited CreateNew(AOwner {$ifdef FPC} ,0 {$endif});
   //
   FPreviewList := TObjectList.Create;
   //
@@ -1039,6 +1050,7 @@ begin
           'Várias páginas'#13;
       end;
     end;
+{$ifdef INFOFORTES}
     PanelCopyright := TPanel.Create(Self);
     with PanelCopyright do
     begin
@@ -1081,6 +1093,7 @@ begin
         Spacing := -1;
       end;
     end;
+{$endif}
   end;
   TimerRepeat := TTimer.Create(Self);
   with TimerRepeat do
@@ -1120,8 +1133,10 @@ begin
   SpeedButtonClose.Hint := LocaleStrings.LS_CloseStr;
   SpeedButtonClose.ShowHint := True;
   SpeedButtonClose.Caption := LocaleStrings.LS_CloseStr;
+{$ifdef ORIGINAL}
   SpeedButtonCopyright.Hint := CS_ProductTitleStr + '  ' + IntToStr(CommercialVersion) + '.' + IntToStr(ReleaseVersion) + CommentVersion;
   SpeedButtonCopyright.ShowHint := True;
+{$endif}
   ComboBoxZoom.Items[8] := LocaleStrings.LS_EntireWidthStr;
   ComboBoxZoom.Items[9] := LocaleStrings.LS_EntirePageStr;
   ComboBoxZoom.Items[10] := LocaleStrings.LS_MultiplePagesStr;
@@ -1211,7 +1226,8 @@ begin
   RLPrinter.Copies := 1;
   priorfocus := Screen.ActiveControl;
   try
-    dialog := TRLPrintDialog.CreateNew(nil);
+    // FIXME/FPC: SVN no requiere el 2do parametro.
+    dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif});
     try
       dialog.MaxPage := Preview.Pages.PageCount;
       dialog.Copies := 1;
@@ -1278,7 +1294,8 @@ begin
     SetupInstance.BeforeSave(Self);
   priorfocus := Screen.ActiveControl;
   try
-    with TRLSaveDialog.CreateNew(nil) do
+    // FIXME/FPC: SVN no requiere el 2do parametro.
+    with TRLSaveDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif}) do
       try
         MaxPage := Preview.Pages.PageCount;
         if Self.Preview.Pages.Title <> '' then

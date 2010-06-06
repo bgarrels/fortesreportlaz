@@ -1,10 +1,17 @@
 {@unit RLHTMLFilter - Implementação do filtro para criação de páginas web. }
 unit RLHTMLFilter;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  SysUtils, Classes, Contnrs, 
+  SysUtils, Classes, Contnrs,
+{$ifdef FPC}
+  Types, Graphics, RLMetaVCL,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -13,7 +20,8 @@ uses
 {$ifdef VCL}
   Graphics, RLMetaVCL, 
 {$else}
-  QGraphics, RLMetaCLX, 
+  QGraphics, RLMetaCLX,
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLFilters, RLUtils, RLTypes;
 

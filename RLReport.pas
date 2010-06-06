@@ -5,32 +5,43 @@ interface
 
 uses
   DB, Classes, SysUtils, Math, Contnrs, TypInfo,
+{$ifdef FPC}
+  LCLIntf,
+  LCLType,
+  LMessages,
+  FileUtil,
+  Variants,
+  Types,
+  ExtCtrls, DBCtrls, Controls, Forms, Dialogs, StdCtrls, Messages, Buttons, Graphics, MaskUtils,
+  RLMetaVCL,
+{$else}
 {$ifndef DELPHI5}
   Variants,
 {$endif}
 {$ifndef LINUX}
   Windows,
 {$else}
-  Types, 
+  Types,
 {$endif}
 {$ifdef VCL}
-  ExtCtrls, DBCtrls, Controls, Forms, Dialogs, StdCtrls, Messages, Buttons, Graphics, Mask, 
+  ExtCtrls, DBCtrls, Controls, Forms, Dialogs, StdCtrls, Messages, Buttons, Graphics, Mask,
 {$ifdef DELPHI}
 {$ifndef DELPHI5}
-  MaskUtils, 
+  MaskUtils,
 {$endif}
 {$endif}
 {$ifdef CPP}
-  MaskUtils, 
+  MaskUtils,
 {$endif}
 {$else}
   Qt, QTypes, QExtCtrls, QDBCtrls, QControls, QForms, QDialogs,
   QStdCtrls, QButtons, QGraphics, MaskUtils,
 {$endif}
 {$ifdef VCL}
-  RLMetaVCL, 
+  RLMetaVCL,
 {$else}
   RLMetaCLX,
+{$endif}
 {$endif}
   RLMetaFile, RLFeedBack, RLParser, RLFilters, RLConsts, RLUtils,
   RLPrintDialog, RLPreviewForm, RLPreview,
@@ -1225,11 +1236,11 @@ type
     procedure RequestAlign; override;
     function GetClientRect: TRect; override;
     procedure SetName(const Value: TComponentName); override;
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
     procedure SetParent(AParent: TWinControl); override;
 {$else}
     procedure SetParent(const AParent: TWidgetControl); override;
-{$endif}
+{$ifend}
     procedure Paint; override;
 
     {@method SetAutoSize - SetAutoSize estendido. :/}
@@ -1392,13 +1403,13 @@ type
     {@method SetAttribute - Modifica o valor do controle. :/}
     function SetAttribute(const AName: string; AValue: Variant): Boolean; virtual;
 
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
     procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
     procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
 {$else}
     procedure ColorChanged; override;
     procedure FontChanged; override;
-{$endif}
+{$ifend}
 
     {@method PrepareStatics - Prepara os controles filhos do painel antes de imprimí-los.
      Esta operação consiste em invocar os eventos BeforePrint de cada controle, dando oportunidade para o
@@ -6493,7 +6504,7 @@ begin
   end;
 end;
 
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
 procedure TRLCustomControl.CMColorChanged(var Message: TMessage);
 begin
   if not (csLoading in ComponentState) and (Color <> clWhite) then
@@ -6526,7 +6537,7 @@ begin
   inherited;
 end;
 
-{$endif}
+{$ifend}
 
 type
   TFriendControl = class(TControl)
@@ -6559,7 +6570,11 @@ begin
     if AControl is TWinControl then
       TWinControl(AControl).PaintTo(ABitmap.Canvas.Handle, 0, 0)
     else if AControl is TControl then
+{$ifdef FPC}
+      AControl.Perform(LM_PAINT, ABitmap.Canvas.Handle, 0)
+{$else}
       AControl.Perform(WM_PAINT, ABitmap.Canvas.Handle, 0)
+{$endif}
     else
       Abort;
 {$endif}
@@ -7576,16 +7591,15 @@ begin
   Result := False;
 end;
 
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
 procedure TRLCustomControl.SetParent(AParent: TWinControl);
 var
   P: TWinControl;
 {$else}
-
 procedure TRLCustomControl.SetParent(const AParent: TWidgetControl);
 var
   P: TWidgetControl;
-{$endif}
+{$ifend}
 begin
   P := AParent;
   if P <> nil then
@@ -8231,12 +8245,16 @@ begin
       Result := ''
     else if AField is TBlobField then
       Result := ''
+{$ifndef FPC}
     else if AField is TObjectField then
       Result := 0
+{$endif}
     else if AField is TVariantField then
       Result := 0
+{$ifndef FPC}
     else if AField is TInterfaceField then
       Result := ''
+{$endif}
     else
       Result := Null
   else
@@ -13286,7 +13304,8 @@ function TRLCustomReport.ShowPrintDialog: Boolean;
 var
   Dialog: TRLPrintDialog;
 begin
-  Dialog := TRLPrintDialog.CreateNew(nil);
+  // FIXME/FPC: Con SVN el 2do parametro es opcional.
+  Dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif});
   try
     Dialog.HelpContext := Self.HelpContext;
     if Dialog.HelpContext <> 0 then
@@ -13449,7 +13468,7 @@ begin
   end;
 end;
 
-function TRLCustomReport.GetPageNumber;
+function TRLCustomReport.GetPageNumber: Integer;
 begin
   Result := MasterReport.FCurrentPageNumber;
 end;

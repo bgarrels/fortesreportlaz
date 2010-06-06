@@ -1,10 +1,17 @@
 {@unit RLFilters - Implementação do filtro padrão de impressão e classes abstratas para filtros de gravação e impressão. }
 unit RLFilters;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  Classes, SysUtils, 
+  Classes, SysUtils,
+{$ifdef FPC}
+  Types, Forms, Dialogs,
+{$else}
 {$ifndef LINUX}
   Windows, 
 {$else}
@@ -13,7 +20,8 @@ uses
 {$ifdef VCL}
   Forms, Dialogs, 
 {$else}
-  QForms, QDialogs, 
+  QForms, QDialogs,
+{$endif}
 {$endif}
   RLMetaFile, RLConsts, RLTypes, RLUtils, RLFeedBack, RLPrinters;
 

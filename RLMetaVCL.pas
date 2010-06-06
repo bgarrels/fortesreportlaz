@@ -1,9 +1,16 @@
 unit RLMetaVCL;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
-  Windows, SysUtils, Graphics, Classes, Math, StdCtrls, 
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  SysUtils, Graphics, Classes, Math, StdCtrls,
   RLMetaFile, RLUtils, RLConsts;
 
 type
@@ -284,7 +291,11 @@ end;
 
 function FromMetaColor(const ASource: TRLMetaColor): TColor;
 begin
+{$ifdef FPC}
+  Result := RGBToColor(ASource.Red, ASource.Green, ASource.Blue);
+{$else}
   Result := RGB(ASource.Red, ASource.Green, ASource.Blue);
+{$endif}
 end;
 
 function FromMetaPenMode(ASource: TRLMetaPenMode): TPenMode;
@@ -486,7 +497,11 @@ end;
 
 function CanvasGetClipRect(ACanvas: TCanvas): TRect;
 begin
+{$ifdef FPC}
+  Result := ACanvas.ClipRect;
+{$else}
   GetClipBox(ACanvas.Handle, Result);
+{$endif}
 end;
 
 procedure CanvasSetClipRect(ACanvas: TCanvas; const ARect: TRect);
@@ -495,17 +510,30 @@ var
 begin
   isnull := ((ARect.Right - ARect.Left) = 0) or ((ARect.Bottom - ARect.Top) = 0);
   if isnull then
+  {$ifdef FPC}
+    ACanvas.Clipping := False
+  {$else}
     SelectClipRgn(ACanvas.Handle, 0)
+  {$endif}
   else
   begin
+  {$ifdef FPC}
+    ACanvas.ClipRect := ARect;
+    ACanvas.Clipping := True;
+  {$else}
     SelectClipRgn(ACanvas.Handle, 0);
     IntersectClipRect(ACanvas.Handle, ARect.Left, ARect.Top, ARect.Right, ARect.Bottom);
+  {$endif}
   end;
 end;
 
 procedure CanvasResetClipRect(ACanvas: TCanvas);
 begin
+{$ifdef FPC}
+  ACanvas.Clipping := False;
+{$else}
   SelectClipRgn(ACanvas.Handle, 0);
+{$endif}
 end;
 
 function CanvasGetRectData(ACanvas: TCanvas; const ARect: TRect): String;
@@ -597,6 +625,11 @@ const
     (Count: 2;Lengths: (1, 1, 0, 0, 0, 0)), // psDot
     (Count: 4;Lengths: (2, 1, 1, 1, 0, 0)), // psDashDot
     (Count: 6;Lengths: (3, 1, 1, 1, 1, 1)), // psDashDotDot
+{$ifdef FPC}
+    (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)), // psPattern
+    (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)), // psUserStyle
+    (Count: 0;Lengths: (0, 0, 0, 0, 0, 0))  // psClear
+{$else}
     (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)), // psClear
 {$ifdef DELPHI101} // delphi 2006
     (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)), // psClear
@@ -610,6 +643,7 @@ const
     (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)), // psUserStyle
     (Count: 0;Lengths: (0, 0, 0, 0, 0, 0)) // psAlternate
 {$ifend}
+{$endif}
     );
 
 procedure CanvasLineToEx(ACanvas: TCanvas; X, Y: Integer);
@@ -676,7 +710,13 @@ begin
   end;
 end;
 
+{$ifdef MSWINDOWS}
+
 procedure FontGetMetrics(const AFontName: AnsiString; AFontStyles: TFontStyles; var AFontRec: TRLMetaFontMetrics);
+{$ifdef FPC}
+type
+  TOutlineTextmetricA = TOutlineTextmetric;
+{$endif}
 var
   size: Integer;
   outl: POutlineTextMetric;
@@ -736,6 +776,54 @@ begin
     FreeMem(outl, size);
   end;
 end;
+
+{$else}
+
+// Tomado de fortes324forlaz (con modificaciones).
+// FIXME/FPC: Para linux ver http://tronche.com/gui/x/xlib/graphics/font-metrics/
+procedure FontGetMetrics(const aFontName:string; aFontStyles:TFontStyles; var aFontRec:TRLMetaFontMetrics);
+var
+  Aux: TBitmap;
+  I: integer;
+begin
+  Aux := NeedAuxBitmap;
+  Aux.Canvas.Font.Name := aFontName;
+  Aux.Canvas.Font.Style:= aFontStyles;
+  Aux.Canvas.Font.Size := 750;
+  //
+  aFontRec.TrueType := true;
+  aFontRec.BaseFont := aFontName;
+  aFontRec.FirstChar:= 32;
+  aFontRec.LastChar := 255;
+  for I := aFontRec.FirstChar to aFontRec.LastChar do
+    aFontRec.Widths[i] := Aux.Canvas.TextWidth(Chr(I));
+  //
+  aFontRec.FontDescriptor.Name := aFontName;
+  aFontRec.FontDescriptor.Styles := '';
+  if fsBold in aFontStyles then
+    aFontRec.FontDescriptor.Styles := aFontRec.FontDescriptor.Styles + 'Bold';
+  if fsItalic in aFontStyles then
+    aFontRec.FontDescriptor.Styles := aFontRec.FontDescriptor.Styles + 'Italic';
+  if fsUnderline in aFontStyles then
+    aFontRec.FontDescriptor.Styles := aFontRec.FontDescriptor.Styles + 'Underline';
+  if fsStrikeOut in aFontStyles then
+    aFontRec.FontDescriptor.Styles := aFontRec.FontDescriptor.Styles + 'StrikeOut';
+  aFontRec.FontDescriptor.Flags := 32;
+  aFontRec.FontDescriptor.FontBBox := Rect(-498,1023,1120,-307);
+  aFontRec.FontDescriptor.MissingWidth := 0;
+  aFontRec.FontDescriptor.StemV := 0;
+  aFontRec.FontDescriptor.StemH := 0;
+  aFontRec.FontDescriptor.ItalicAngle := 0;
+  aFontRec.FontDescriptor.CapHeight := 0;
+  aFontRec.FontDescriptor.XHeight := 0;
+  aFontRec.FontDescriptor.Ascent := 0;
+  aFontRec.FontDescriptor.Descent := 0;
+  aFontRec.FontDescriptor.Leading := 0;
+  aFontRec.FontDescriptor.MaxWidth := 0;
+  aFontRec.FontDescriptor.AvgWidth := 0;
+end;
+
+{$endif}
 
 end.
 

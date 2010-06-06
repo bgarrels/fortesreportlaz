@@ -1,14 +1,22 @@
 {@unit RLSpoolFilter - Implementação do filtro padrão para impressoras. }
 unit RLSpoolFilter;
 
+{$ifdef FPC}
+{$MODE Delphi}
+{$endif}
+
 interface
 
 uses
-  Classes, SysUtils, Contnrs, 
+  Classes, SysUtils, Contnrs,
+{$ifdef FPC}
+  Types, Graphics, RLMetaVCL,
+{$else}
 {$ifndef LINUX}
-  Windows, Graphics, RLMetaVCL, 
+  Windows, Graphics, RLMetaVCL,
 {$else}
   Types, QGraphics, RLMetaCLX, 
+{$endif}
 {$endif}
   RLMetaFile, RLFilters, RLTypes, RLPrinters, RLConsts, RLUtils;
 
@@ -68,6 +76,7 @@ begin
   Result := SpoolFilterInstance;
 end;
 
+{$ifndef FPC}
 {$ifndef LINUX}
 procedure SpecialStretchDraw(ADest: TCanvas; ARect: TRect; AGraphic: TGraphic);
 var
@@ -210,6 +219,7 @@ begin
     foo.free;
   end;
 end;
+{$endif}
 {$endif}
 
 { TRLSpoolFilter }
@@ -410,12 +420,24 @@ var
   procedure DrawImage(AObj: TRLImageObject);
   var
     R: TRect;
+{$ifdef FPC}
+    B: TGraphic;
+{$else}
 {$ifndef LINUX}
     B: TGraphic;
+{$endif}
 {$endif}
   begin
     ProjectRect(AObj.BoundsRect, R);
     //
+{$ifdef FPC}
+  B := FromMetaGraphic(AObj.Data);
+  try
+    RLPrinter.Canvas.StretchDraw(R, B);
+  finally
+    B.Free;
+  end;
+{$else}
 {$ifndef LINUX}
     B := FromMetaGraphic(AObj.Data);
     try
@@ -427,6 +449,7 @@ var
     end;
 {$else}
     CanvasStretchDraw(RLPrinter.Canvas, R, AObj.Data, AObj.Parity);
+{$endif}
 {$endif}
   end;
   procedure PushClipRect(const ARect: TRect);

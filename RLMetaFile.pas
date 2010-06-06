@@ -15,15 +15,23 @@
 {@unit RLMetaFile - Implementação das classes e rotinas para manipulação de coleções gráficas. }
 unit RLMetaFile;
 
+{$ifdef FPC} 
+{$MODE Delphi} 
+{$endif}
+
 interface
 
 uses
   SysUtils, Contnrs,
+{$ifdef FPC}
+  Types, Graphics, Dialogs,
+{$else}
 {$ifdef VCL}
   Windows, Graphics, Dialogs,
 {$endif}
 {$ifdef CLX}
   Types, QGraphics, QDialogs,
+{$endif}
 {$endif}
   Classes, Math,
   RLUtils, RLConsts;
@@ -974,9 +982,9 @@ function NewGroupId: Integer;
 
 implementation
 
-{$ifdef VCL}
+{$if defined(VCL) or defined(FPC)}
 uses RLMetaVCL;
-{$endif}
+{$ifend}
 {$ifdef CLX}
 uses RLMetaCLX;
 {$endif}
