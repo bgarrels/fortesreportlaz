@@ -65,7 +65,6 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
-///{$R *.DFM}
 
 { TfrmRLFindDialog }
 

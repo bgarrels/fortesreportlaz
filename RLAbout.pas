@@ -49,8 +49,7 @@ implementation
 
 constructor TFormRLAbout.Create(AOwner: TComponent);
 begin
-  // FIXME/FPC: Con SVN el 2do param es opcional.
-  inherited CreateNew(AOwner {$ifdef FPC} ,0 {$endif});
+  inherited CreateNew(AOwner {$ifdef FPCOLD} ,0 {$endif});
   TypedAuthorKey := '';
   Init;
 end;

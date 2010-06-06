@@ -13,6 +13,7 @@
 {$endif}
 
 {$ifndef FPC}
+
 {$ifdef LINUX}
   {$define KYLIX}
 {$endif}
@@ -22,4 +23,5 @@
 {$else}
   {$define WINDOWS}
 {$endif}
+
 {$endif}

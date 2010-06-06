@@ -14,7 +14,7 @@ object frmRLFeedBack: TfrmRLFeedBack
   Font.Pitch = fpVariable
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.29'
   object LabelStepName: TLabel
     Left = 14
     Height = 20

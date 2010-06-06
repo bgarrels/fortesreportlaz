@@ -351,8 +351,7 @@ begin
     FBoxes.Add(B);
   end;
   //
-// FIXME/FPC: Esto funciona con SVN.
-{$ifdef FPC}
+{$ifdef FPCOLD}
 {$ifndef LINUX}
   HorzScrollBar.Tracking := True;
   VertScrollBar.Tracking := True;
@@ -390,7 +389,7 @@ end;
 {$ifdef FPC}
 procedure TRLPreview.CopyPageWMF(Sender: TObject);
 begin
-  // FIXME/FPC: Implementar!
+  // FIXME: Implementar!
 end;
 {$else}
 procedure TRLPreview.CopyPageWMF(Sender: TObject);

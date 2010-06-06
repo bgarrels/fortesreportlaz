@@ -13304,8 +13304,7 @@ function TRLCustomReport.ShowPrintDialog: Boolean;
 var
   Dialog: TRLPrintDialog;
 begin
-  // FIXME/FPC: Con SVN el 2do parametro es opcional.
-  Dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif});
+  Dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPCOLD} ,0 {$endif});
   try
     Dialog.HelpContext := Self.HelpContext;
     if Dialog.HelpContext <> 0 then

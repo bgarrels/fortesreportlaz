@@ -276,7 +276,6 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
-///{$R *.dfm}
 
 var
   SetupInstance: TRLPreviewSetup = nil;
@@ -399,8 +398,7 @@ begin
   FFindDialog := nil;
   FSpeedButtonCustomAction := nil;
   //
-  // FIXME/FPC: SVN no requiere el 2do parametro.
-  inherited CreateNew(AOwner {$ifdef FPC} ,0 {$endif});
+  inherited CreateNew(AOwner {$ifdef FPCOLD} ,0 {$endif});
   //
   FPreviewList := TObjectList.Create;
   //
@@ -1050,7 +1048,7 @@ begin
           'Várias páginas'#13;
       end;
     end;
-{$ifdef INFOFORTES}
+{$ifdef ORIGINAL}
     PanelCopyright := TPanel.Create(Self);
     with PanelCopyright do
     begin
@@ -1226,8 +1224,7 @@ begin
   RLPrinter.Copies := 1;
   priorfocus := Screen.ActiveControl;
   try
-    // FIXME/FPC: SVN no requiere el 2do parametro.
-    dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif});
+    dialog := TRLPrintDialog.CreateNew(nil {$ifdef FPCOLD} ,0 {$endif});
     try
       dialog.MaxPage := Preview.Pages.PageCount;
       dialog.Copies := 1;
@@ -1294,8 +1291,7 @@ begin
     SetupInstance.BeforeSave(Self);
   priorfocus := Screen.ActiveControl;
   try
-    // FIXME/FPC: SVN no requiere el 2do parametro.
-    with TRLSaveDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif}) do
+    with TRLSaveDialog.CreateNew(nil {$ifdef FPCOLD} ,0 {$endif}) do
       try
         MaxPage := Preview.Pages.PageCount;
         if Self.Preview.Pages.Title <> '' then

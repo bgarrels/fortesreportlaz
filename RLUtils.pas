@@ -179,14 +179,22 @@ procedure LogClear;
 procedure Log(const AMsg: String);
 
 type
-{$if defined(KYLIX) or defined(FPC)}
+{$ifdef KYLIX}
   TRGBQuad = packed record
     rgbBlue: Byte;
     rgbGreen: Byte;
     rgbRed: Byte;
     rgbReserved: Byte;
   end;
-{$ifend}
+{$endif}
+{$ifdef FPC}
+  TRGBQuad = packed record
+    rgbBlue: Byte;
+    rgbGreen: Byte;
+    rgbRed: Byte;
+    rgbReserved: Byte;
+  end;
+{$endif}
   TRGBArray = array[0..0] of TRGBQuad;
   PRGBArray = ^TRGBArray;
 

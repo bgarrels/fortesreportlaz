@@ -57,7 +57,6 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
-///{$R *.DFM}
 
 uses
   RLReport, RLConsts;
@@ -149,8 +148,7 @@ constructor TfrmRLFeedBack.Create(const ATitle: String; ALevels: Integer = 1);
 var
   H, D: Integer;
 begin
-  // FIXME/FPC: Con SVN el 2do parametro es opcional.
-  inherited CreateNew(nil {$ifdef FPC} ,0 {$endif});
+  inherited CreateNew(nil {$ifdef FPCOLD} ,0 {$endif});
   Init;
   //
   D := Height - BitBtnCancel.Top;

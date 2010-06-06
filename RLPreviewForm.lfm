@@ -1,25 +1,25 @@
 object RLPreviewForm: TRLPreviewForm
   Left = 0
-  Height = 977
+  Height = 974
   Top = 0
-  Width = 1280
+  Width = 1272
   VertScrollBar.Range = 29
   ActiveControl = PanelTools
   Caption = 'Pré-visualização'
-  ClientHeight = 977
-  ClientWidth = 1280
+  ClientHeight = 974
+  ClientWidth = 1272
   Font.Height = 11
   Font.Name = 'MS Sans Serif'
   Font.Pitch = fpVariable
   KeyPreview = True
   OnKeyDown = FormKeyDown
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.29'
   WindowState = wsMaximized
   object PanelContainer: TPanel
     Left = 0
-    Height = 953
+    Height = 950
     Top = 24
-    Width = 1280
+    Width = 1272
     Align = alClient
     BevelOuter = bvLowered
     Caption = ' '
@@ -29,13 +29,13 @@ object RLPreviewForm: TRLPreviewForm
     Left = 0
     Height = 24
     Top = 0
-    Width = 1280
+    Width = 1272
     Align = alTop
     BevelOuter = bvNone
     BorderWidth = 1
     Caption = ' '
     ClientHeight = 24
-    ClientWidth = 1280
+    ClientWidth = 1272
     TabOrder = 1
     object SpeedButtonPrint: TSpeedButton
       Left = 1
