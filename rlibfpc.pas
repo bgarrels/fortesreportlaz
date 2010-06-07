@@ -9,9 +9,9 @@ interface
 uses
     RLXLSFilter, RLAbout, RLBarcode, RLConsts, RLDesign, RLDraftFilter, 
   RLFeedBack, RLFilters, RLFindDialog, RLHTMLFilter, RLMetaFile, RLMetaVCL, 
-  RLParser, RLPDFFilter, RLPreview, RLPreviewForm, RLPrintDialog, RLPrinters, 
-  RLReg, RLReport, RLRichFilter, RLRichText, RLSaveDialog, RLSpoolFilter, 
-  RLTypes, RLUtils, LazarusPackageIntf;
+  RLParser, RLPDFFilter, RLPreview, RLPrintDialog, RLPrinters, RLReg, 
+  RLReport, RLRichFilter, RLRichText, RLSaveDialog, RLSpoolFilter, RLTypes, 
+  RLUtils, LazarusPackageIntf;
 
 implementation
 

@@ -22,7 +22,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="35">
+    <Files Count="33">
       <Item1>
         <Filename Value="RLXLSFilter.pas"/>
         <UnitName Value="RLXLSFilter"/>
@@ -104,66 +104,58 @@
         <UnitName Value="RLPreview"/>
       </Item20>
       <Item21>
-        <Filename Value="RLPreviewForm.lfm"/>
+        <Filename Value="RLPrintDialog.lfm"/>
         <Type Value="LFM"/>
       </Item21>
       <Item22>
-        <Filename Value="RLPreviewForm.pas"/>
-        <UnitName Value="RLPreviewForm"/>
-      </Item22>
-      <Item23>
-        <Filename Value="RLPrintDialog.lfm"/>
-        <Type Value="LFM"/>
-      </Item23>
-      <Item24>
         <Filename Value="RLPrintDialog.pas"/>
         <UnitName Value="RLPrintDialog"/>
-      </Item24>
-      <Item25>
+      </Item22>
+      <Item23>
         <Filename Value="RLPrinters.pas"/>
         <UnitName Value="RLPrinters"/>
-      </Item25>
-      <Item26>
+      </Item23>
+      <Item24>
         <Filename Value="RLReg.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="RLReg"/>
-      </Item26>
-      <Item27>
+      </Item24>
+      <Item25>
         <Filename Value="RLReport.pas"/>
         <UnitName Value="RLReport"/>
-      </Item27>
-      <Item28>
+      </Item25>
+      <Item26>
         <Filename Value="RLRichFilter.pas"/>
         <UnitName Value="RLRichFilter"/>
-      </Item28>
-      <Item29>
+      </Item26>
+      <Item27>
         <Filename Value="RLRichText.pas"/>
         <UnitName Value="RLRichText"/>
-      </Item29>
-      <Item30>
+      </Item27>
+      <Item28>
         <Filename Value="RLSaveDialog.lfm"/>
         <Type Value="LFM"/>
-      </Item30>
-      <Item31>
+      </Item28>
+      <Item29>
         <Filename Value="RLSaveDialog.pas"/>
         <UnitName Value="RLSaveDialog"/>
-      </Item31>
-      <Item32>
+      </Item29>
+      <Item30>
         <Filename Value="RLSpoolFilter.pas"/>
         <UnitName Value="RLSpoolFilter"/>
-      </Item32>
-      <Item33>
+      </Item30>
+      <Item31>
         <Filename Value="RLTypes.pas"/>
         <UnitName Value="RLTypes"/>
-      </Item33>
-      <Item34>
+      </Item31>
+      <Item32>
         <Filename Value="RLUtils.pas"/>
         <UnitName Value="RLUtils"/>
-      </Item34>
-      <Item35>
+      </Item32>
+      <Item33>
         <Filename Value="RLReport.dcr"/>
         <Type Value="Binary"/>
-      </Item35>
+      </Item33>
     </Files>
     <Type Value="DesignTime"/>
     <RequiredPkgs Count="5">
