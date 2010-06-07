@@ -12,8 +12,9 @@ uses
 {$ifdef FPC}
     Types, Graphics, RLMetaVCL,
 {$else}
+  Jpeg, 
 {$ifdef VCL}
-  Windows, Graphics, RLMetaVCL, Jpeg, 
+  Windows, Graphics, RLMetaVCL, 
 {$else}
   Types, QGraphics, RLMetaCLX,
 {$endif}
