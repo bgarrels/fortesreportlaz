@@ -1,2 +1,2 @@
 #!/bin/sh
-svn diff -x --ignore-eol-style --no-diff-deleted -r 1 > fortesrep.diff
+svn diff -x --ignore-eol-style -r 1 > fortesrep.diff
