@@ -389,7 +389,7 @@ end;
 {$ifdef FPC}
 procedure TRLPreview.CopyPageWMF(Sender: TObject);
 begin
-  // FIXME: Implementar!
+  // FIXME/FPC: Cómo? Reemplazar por otro formato?
 end;
 {$else}
 procedure TRLPreview.CopyPageWMF(Sender: TObject);
