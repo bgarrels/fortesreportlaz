@@ -57,6 +57,7 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
+///{$R *.DFM}
 
 uses
   RLReport, RLConsts;

@@ -276,6 +276,7 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
+///{$R *.dfm}
 
 var
   SetupInstance: TRLPreviewSetup = nil;
@@ -1048,7 +1049,7 @@ begin
           'Várias páginas'#13;
       end;
     end;
-{$ifdef ORIGINAL}
+{$ifdef INFOFORTES}
     PanelCopyright := TPanel.Create(Self);
     with PanelCopyright do
     begin
@@ -1291,7 +1292,8 @@ begin
     SetupInstance.BeforeSave(Self);
   priorfocus := Screen.ActiveControl;
   try
-    with TRLSaveDialog.CreateNew(nil {$ifdef FPCOLD} ,0 {$endif}) do
+    // FIXME/FPC: SVN no requiere el 2do parametro.
+    with TRLSaveDialog.CreateNew(nil {$ifdef FPC} ,0 {$endif}) do
       try
         MaxPage := Preview.Pages.PageCount;
         if Self.Preview.Pages.Title <> '' then

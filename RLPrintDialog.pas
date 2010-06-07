@@ -107,6 +107,7 @@ implementation
 {$ifdef FPC}
 {$R *.lfm}
 {$endif}
+//{$R *.dfm}
 
 // UTILS
 

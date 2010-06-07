@@ -13,9 +13,9 @@ uses
   SysUtils, Classes, Math, Contnrs,
 {$ifdef FPC}
 {$ifdef Windows}
-  ShellApi, Windows, WinUtilPrn,
+  ShellApi, Windows, 
 {$endif}
-  LCLIntf, LCLType, IntfGraphics, FPImage, FileUtil,
+  LCLIntf, LCLType, OsPrinters, IntfGraphics, FPImage, FileUtil,
   Graphics, RLMetaVCL,
 {$else}
 {$ifndef LINUX}
@@ -1284,7 +1284,7 @@ begin
         tempbmp.PixelFormat := pf32bit;
         tempbmp.Width := Round((AObj.BoundsRect.Right - AObj.BoundsRect.Left) * AspectratioX);
         tempbmp.Height := Round((AObj.BoundsRect.Bottom - AObj.BoundsRect.Top) * AspectratioY);
-        tempbmp.Canvas.StretchDraw(Classes.Rect(0, 0, tempbmp.Width, tempbmp.Height), thegraphic);
+        tempbmp.Canvas.StretchDraw(Rect(0, 0, tempbmp.Width, tempbmp.Height), thegraphic);
         asbitmap.Width := tempbmp.Width;
         asbitmap.Height := tempbmp.Height;
         case FDitheringMethod of

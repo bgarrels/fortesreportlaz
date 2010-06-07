@@ -307,6 +307,7 @@ type
     procedure Assign(Source: TRLPDFFilterPageSetup); reintroduce;
     procedure Clear;
 
+  // FIXME/FPC: Estas propiedades deberian ser published.
   {$ifdef FPC}
     public
   {$else}
