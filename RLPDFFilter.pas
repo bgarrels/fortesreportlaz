@@ -1405,6 +1405,7 @@ begin
       if (S and MetaFontStyleStrikeOut) = MetaFontStyleStrikeOut then
         N := N + ',StrikeOut';
       Writeln('/TrueType/Name/F' + IntToStr(I) + '/BaseFont/' + N);
+{$ifdef PDFEXTRAFONTINFO}
       Writeln('/FirstChar ' + IntToStr(rec.FirstChar));
       Writeln('/LastChar ' + IntToStr(rec.LastChar));
       Writeln('/Widths [');
@@ -1421,6 +1422,7 @@ begin
       end;
       Writeln;
       Writeln(']');
+{$endif}
       Writeln('/FontDescriptor ' + PDF_IndirectObjStr(dsc));
     end
     else
@@ -1437,6 +1439,7 @@ begin
     Writeln;
     EndObj;
 
+{$ifdef PDFEXTRAFONTINFO}
     if ttf then
     begin
       BeginObj(dsc);
@@ -1459,6 +1462,7 @@ begin
       Writeln('/AvgWidth ' + IntToStr(rec.FontDescriptor.AvgWidth));
       EndObj;
     end;
+{$endif}
   end;
 end;
 
@@ -2066,4 +2070,4 @@ finalization
   DefaultTextControl.Free;
   DefaultDocumentInfo.Free;
 
-end.
+end.
